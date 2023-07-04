@@ -1,0 +1,158 @@
+
+/*
+  GY-271 Compass
+  modified on 02 Sep 2020
+  by Mohammad Reza Akbari @ Electropeak
+  Home
+*/
+
+// I2C Library
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include "Lib.h"
+// QMC5883L Compass Library
+#include <QMC5883LCompass.h>
+#include "OLED_I2C.h"
+
+OLED myOLED(SDA, SCL, 8);
+Pimoroni_IS31FL3731_5x5RGB matrix = Pimoroni_IS31FL3731_5x5RGB();
+
+extern uint8_t TinyFont[];
+extern uint8_t SmallFont[];
+extern uint8_t MediumNumbers[];
+extern uint8_t BigNumbers[];
+
+QMC5883LCompass compass;
+
+int earth = 56;
+int max_measured = 0;
+int min_measured = 0;
+int upper_half = 0;
+
+int earth_changed = 0;
+
+float TOP_THRESHOLD = 0.75;
+
+int MIN_COLOR_INTENSITY = 1;
+int MAX_COLOR_INTENSITY = 32;
+
+int PIN_SET_EARTH = 13;
+
+int color_intensity(int strength, int min, int max) {
+  return ((strength - min) / (max - min)) * (MAX_COLOR_INTENSITY - MIN_COLOR_INTENSITY) + MIN_COLOR_INTENSITY;
+}
+
+void set_color(int r, int g, int b) {
+  for (int i = 0; i < 5; i++) {
+    for (int j = 0; j < 5; j++) {
+      matrix.drawPixel(i + 1, j + 1, r, g, b);
+    }
+  }
+}
+
+void setup() {
+  // Initialize the serial port.
+  Serial.begin(9600);
+  // Initialize I2C.
+  Wire.begin();
+
+  // Initialize the Compass.
+  compass.init();
+
+  myOLED.begin();
+  myOLED.clrScr();
+
+  matrix.begin();
+  matrix.clear();
+
+  pinMode(PIN_SET_EARTH, INPUT);
+}
+
+// 128×64
+void to_screen(float strength) {
+  int integer = (int) strength;
+  int decimal = abs((strength - (int) strength)*10);
+
+  char buffer[40];
+  sprintf(buffer, "%d.%d", integer, decimal);
+
+  myOLED.clrScr();
+
+  myOLED.setFont(strength > upper_half ? BigNumbers : abs(strength) > earth ? MediumNumbers : SmallFont);
+
+  myOLED.print(buffer, 5, 20);
+
+  myOLED.setFont(SmallFont);
+  //sprintf(buffer, "earth: %d | max: %d", earth, max_measured);
+  sprintf(buffer, "earth %d < %d < %d", earth, upper_half, max_measured);
+  myOLED.print(buffer, 0, 0);
+
+  myOLED.update();
+}
+
+void to_console(float strength) {
+
+  if (strength < earth) {
+    Serial.print("EARTH:  ");
+
+  } else if (strength < upper_half) {
+    Serial.print("MIDDLE: ");
+
+  } else {
+    Serial.print("TOP:    ");
+  }
+
+  int integer = (int) strength;
+  int decimal = abs((strength - (int) strength)*10);
+  char buffer[40];
+  sprintf(buffer, "%d.%d | %d", integer, decimal, upper_half);
+  Serial.println(buffer);
+
+  if (earth_changed) {
+    sprintf(buffer, "earth set to %d", earth);
+    Serial.println(buffer);
+  }
+}
+
+void to_led(float strength) {
+  if (strength < earth) {
+    // R, G, *B*
+    set_color(0, 0, color_intensity(strength, min_measured, earth));
+  } else if (strength < upper_half) {
+    // R, *G*, B
+    set_color(0, color_intensity(strength, earth, upper_half), 0);
+  } else {
+    // *R*, G, B
+    set_color(color_intensity(strength, upper_half, max_measured), 0, 0);
+  }
+}
+
+void loop() {
+  compass.read();
+
+  float strength = sqrt(
+    pow(compass.getX(), 2)
+    + pow(compass.getY(), 2)
+    + pow(compass.getZ(), 2)
+    ) / 100;
+
+  if (strength > max_measured) {
+    max_measured = strength;
+    upper_half = earth + ((float) max_measured - earth) * TOP_THRESHOLD;
+  }
+
+  if (strength < min_measured) {
+    min_measured = strength;
+  }
+  if (digitalRead(PIN_SET_EARTH) == HIGH) {
+    earth = max_measured + 1;
+    earth_changed = 1;
+  }
+  to_console(strength);
+  to_screen(strength);
+  earth_changed = 0;
+
+  to_led(strength);
+
+  delay(500);
+}

@@ -1,0 +1,44 @@
+#include <AccelStepper.h>
+#define HALFSTEP 8
+
+// Motor pin definitions
+#define motor1Pin1  8     // IN1 on the ULN2003 driver 1
+#define motor2Pin1  4     // IN1 on the ULN2003 driver 1
+
+
+// Initialize with pin sequence IN1-IN3-IN2-IN4 for using the AccelStepper with 28BYJ-48
+AccelStepper stepper1(HALFSTEP, motor1Pin1, motor1Pin1 + 2, motor1Pin1 + 1, motor1Pin1 + 3);
+AccelStepper stepper2(HALFSTEP, motor2Pin1, motor2Pin1 + 2, motor2Pin1 + 1, motor2Pin1 + 3);
+
+void setup() {
+  Serial.begin(9600);
+
+  Serial.println("setup 1");
+  stepper1.setMaxSpeed(1000.0);
+  stepper1.setAcceleration(100.0);
+  stepper1.setSpeed(200);
+  stepper1.moveTo(20000);
+
+  Serial.println("setup 2");
+  stepper2.setMaxSpeed(1000.0);
+  stepper2.setAcceleration(100.0);
+  stepper2.setSpeed(200);
+  stepper2.moveTo(20000);
+  Serial.println("---");
+
+}//--(end setup )---
+
+void loop() {
+  Serial.println(".");
+  //Change direction when the stepper reaches the target position
+  if (stepper1.distanceToGo() == 0) {
+    stepper1.moveTo(-stepper1.currentPosition());
+  }
+  stepper1.run();
+
+  if (stepper2.distanceToGo() == 0) {
+    stepper2.moveTo(-stepper2.currentPosition());
+  }
+  stepper2.run();
+  //delay(20);
+}

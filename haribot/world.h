@@ -1,0 +1,12 @@
+#define PI 3.141592653589793
+#define WHEEL_PERIMETER 15.3
+#define R_TWO_WHEELS_TURN 7.75
+#define WHEEL_DIST 15
+
+#define TWO_WHEELS_90_TURN (0.5*PI*R_TWO_WHEELS_TURN)
+
+#define ONE_WHEEL_90_TURN (0.5*PI*WHEEL_DIST)
+
+#define SQUARE_SIZE 33
+
+#define CM_TO_STEP(cm) (int)((cm * (float) STEP_COUNT) / (float) WHEEL_PERIMETER)

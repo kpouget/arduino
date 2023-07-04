@@ -1,0 +1,16 @@
+#! /bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+set -o errtrace
+set -x
+
+USB=/dev/ttyUSB0
+if [[ ! -e "$USB" ]]; then
+  USB=/dev/ttyACM0
+fi
+
+arduino-cli compile --fqbn arduino:avr:uno
+arduino-cli upload --fqbn arduino:avr:uno --port "$USB"
+arduino-cli monitor --port "$USB"

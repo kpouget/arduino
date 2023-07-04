@@ -1,0 +1,5 @@
+1 wheel, 1/2 tour: 12800
+2 wheels, 1/2 tour: 6300
+
+1 wheel, 1 tour: 25600
+2 wheels, 1 tour: 12600

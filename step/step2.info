@@ -1,0 +1,74 @@
+// Inclut la bibliothèque AccelStepper:
+#include <AccelStepper.h>
+
+
+// Définit le type d'interface AccelStepper; Moteur 4 fils en mode demi-pas:
+#define MotorInterfaceType 8
+
+// Initialisation avec la séquence de broches IN1-IN3-IN2-IN4 pour utiliser la bibliothèque AccelStepper avec le moteur pas à pas 28BYJ-48:
+int first = 4;
+int second = 8;
+
+AccelStepper stepper1 = AccelStepper(MotorInterfaceType, first, first+1, first+2, first+3);
+AccelStepper stepper2 = AccelStepper(MotorInterfaceType, second, second+1, second+2, second+3);
+
+void setup() {
+  // Définit le nombre maximum de pas par seconde:
+  stepper1.setMaxSpeed(500);
+  stepper2.setMaxSpeed(500);
+  Serial.begin(9600);
+}
+
+void loop() {
+  Serial.println("loop");
+  // Définit la position actuelle sur 0:
+  stepper1.setCurrentPosition(0);
+  stepper2.setCurrentPosition(0);
+
+  // Faire avancer le moteur à 500 pas / seconde jusqu'à ce que le moteur atteigne 4096 pas (1 tour):
+  while (stepper1.currentPosition() != 4096) {
+    stepper1.setSpeed(500);
+    stepper1.runSpeed();
+  }
+  Serial.println("---");
+  while (stepper2.currentPosition() != 4096) {
+    stepper2.setSpeed(500);
+    stepper2.runSpeed();
+  }
+  Serial.println("loop done");
+  delay(1000);
+  Serial.println("loop 2");
+  // Remise à 0 de la position:
+  stepper1.setCurrentPosition(0);
+  stepper2.setCurrentPosition(0);
+
+  // Faire tourner le moteur en arrière à 1000 pas / seconde jusqu'à ce que le moteur atteigne -4096 pas (1 tour):
+  while (stepper1.currentPosition() != -4096) {
+    stepper1.setSpeed(-1000);
+    stepper1.runSpeed();
+  }
+  Serial.println("---");
+  while (stepper2.currentPosition() != -4096) {
+    stepper2.setSpeed(-1000);
+    stepper2.runSpeed();
+  }
+  Serial.println("loop 2 done");
+  delay(1000);
+  Serial.println("loop 3");
+  // Remise à 0 de la position:
+  stepper1.setCurrentPosition(0);
+  stepper2.setCurrentPosition(0);
+
+  // Faire avancer le moteur à 1000 pas / seconde jusqu'à ce que le moteur atteigne 8192 pas (2 tours):
+  while (stepper1.currentPosition() != 8192) {
+    stepper1.setSpeed(1000);
+    stepper1.runSpeed();
+  }
+  Serial.println("---");
+  while (stepper2.currentPosition() != 8192) {
+    stepper2.setSpeed(1000);
+    stepper2.runSpeed();
+  }
+    Serial.println("loop 3 done");
+  delay(3000);
+}
