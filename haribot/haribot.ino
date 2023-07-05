@@ -15,7 +15,7 @@ void log_info(char *msg) {
   serial_info(msg);
 }
 
-void process_distance() {
+void update_distance() {
   return;
   long distance = dist_read();
 
@@ -32,7 +32,7 @@ void process_distance() {
 static int current_step = 0;
 static char *program = "";
 
-void process_bt() {
+void update_bt() {
   String msg = bt_read();
   if (msg.length() == 0) {
     return;
@@ -48,12 +48,19 @@ void process_bt() {
   program = program_str.c_str();
 
   if (configure()) {
-    current_step = strlen(program);
+    program = "";
+  } else if (cfg_mode == CONFIG_MODE_KEEP_DISTANCE) {
+    distance_new_program();
   }
 }
 
 void process_step() {
   step_do();
+
+  if (cfg_mode == CONFIG_MODE_KEEP_DISTANCE) {
+    distance_process_step();
+    return;
+  }
 
   if (!step_is_done()) {
     return;
@@ -85,9 +92,6 @@ void process_step() {
   case CONFIG_MODE_PROGRAM:
     loop_calibrate(action);
     break;
-  case CONFIG_MODE_DISTANCE:
-    loop_distance(action);
-    break;
 
   default:
     sprintf(buffer, "Unknown mode: '%d'. Panicing\n", cfg_mode);
@@ -104,13 +108,13 @@ void loop() {
   if (current_time - last_bt_read_time > bt_read_delay) {
     last_bt_read_time = current_time;
     /* --- */
-    process_bt();
+    update_bt();
   }
 
   if (dist_read_delay > 0 && current_time - last_dist_read_time > dist_read_delay) {
     last_dist_read_time = current_time;
     /* --- */
-    process_distance();
+    update_distance();
   }
 
   process_step();

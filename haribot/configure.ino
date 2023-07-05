@@ -2,6 +2,7 @@
 
 char buffer[40];
 
+bool cfg_instruction_mode = true;
 int cfg_mode = CONFIG_MODE_PROGRAM;
 int cfg_delay = CONFIG_DELAY_DEFAULT;
 
@@ -12,17 +13,12 @@ unsigned long last_bt_read_time = 0;
 unsigned int dist_read_delay = 0; // in ms
 unsigned long last_dist_read_time = 0;
 
-
-bool prefix(const char *pre, const char *str) {
-    return strncmp(pre, str, strlen(pre)) == 0;
-}
-
 bool configure() {
   if (prefix(CONFIG_HELP_PREFIX, program)) {
 #define str(s) #s
     log_info(CONFIG_MODE_PREFIX str(CONFIG_MODE_CALIBRATE) " --> calibration mode\n");
     log_info(CONFIG_MODE_PREFIX str(CONFIG_MODE_PROGRAM) " --> program mode\n");
-    log_info(CONFIG_MODE_PREFIX str(CONFIG_MODE_DISTANCE) " --> distance mode\n");
+    log_info(CONFIG_MODE_PREFIX str(CONFIG_MODE_KEEP_DISTANCE) " --> keep distance mode\n");
 
     sprintf(buffer, "Current mode: %d\n", cfg_mode);
     log_info(buffer);
@@ -40,8 +36,8 @@ bool configure() {
     case CONFIG_MODE_PROGRAM:
       log_info("Program mode activated.\n");
       break;
-    case CONFIG_MODE_DISTANCE:
-      log_info("Distance mode activated.\n");
+    case CONFIG_MODE_KEEP_DISTANCE:
+      log_info("Keep distance mode activated.\n");
       break;
 
     default:

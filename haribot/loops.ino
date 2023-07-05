@@ -100,11 +100,3 @@ void loop_program(char action) {
     delay(1000);
   }
 }
-
-void loop_distance(char action) {
-  switch (action) {
-  default:
-    log_info("Nothing to do at the moment in distance mode\n");
-    delay(1000);
-  }
-}
