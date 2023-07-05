@@ -1,11 +1,5 @@
 #include "configure.h"
 
-#define BT_READ_DELAY 500 // 0.5s
-unsigned long last_bt_read_time = 0;
-
-#define DIST_READ_DELAY 5000 // 4s
-unsigned long last_dist_read_time = 0;
-
 void setup() {
   bt_setup();
   serial_setup();
@@ -91,6 +85,10 @@ void process_step() {
   case CONFIG_MODE_PROGRAM:
     loop_calibrate(action);
     break;
+  case CONFIG_MODE_DISTANCE:
+    loop_distance(action);
+    break;
+
   default:
     sprintf(buffer, "Unknown mode: '%d'. Panicing\n", cfg_mode);
     log_info(buffer);
@@ -103,13 +101,13 @@ void process_step() {
 void loop() {
   unsigned long current_time = millis();
 
-  if (current_time - last_bt_read_time > BT_READ_DELAY) {
+  if (current_time - last_bt_read_time > bt_read_delay) {
     last_bt_read_time = current_time;
     /* --- */
     process_bt();
   }
 
-  if (current_time - last_dist_read_time > DIST_READ_DELAY) {
+  if (dist_read_delay > 0 && current_time - last_dist_read_time > dist_read_delay) {
     last_dist_read_time = current_time;
     /* --- */
     process_distance();

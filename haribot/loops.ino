@@ -1,7 +1,6 @@
 #include "world.h"
 
 void loop_calibrate(char action) {
-  char buffer[40];
   float cpt = atof(&program[current_step + 1]);
   switch (action) {
   case 'l':
@@ -98,6 +97,14 @@ void loop_program(char action) {
     break;
   case 'x':
   default:
+    delay(1000);
+  }
+}
+
+void loop_distance(char action) {
+  switch (action) {
+  default:
+    log_info("Nothing to do at the moment in distance mode\n");
     delay(1000);
   }
 }

@@ -62,7 +62,6 @@ void step_move(float dist_l, float dist_r) {
   counter_l += dist_l;
   counter_r += dist_r;
 
-  char buffer[40];
   sprintf(buffer, "L+%d = %d | R+%d = %d\n", (int) dist_l, (int) counter_l, (int) dist_r, (int) counter_r);
   log_info(buffer);
 
