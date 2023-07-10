@@ -5,3 +5,14 @@ void serial_setup() {
 void serial_info(char *msg) {
   Serial.print(msg);
 }
+
+String serial_read() {
+  if (! Serial.available()) {
+    return String();
+  }
+
+  String msg = Serial.readString();
+  msg.trim();
+
+  return msg;
+}

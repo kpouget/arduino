@@ -79,6 +79,16 @@ void step_move_steps(int target_l, int target_r) {
   stepper2.runSpeedToPosition();
 }
 
+void step_stop(void) {
+  stepper1.stop();
+  stepper2.stop();
+}
+
+void step_reset(void) {
+  stepper1.setCurrentPosition (0);
+  stepper2.setCurrentPosition (0);
+}
+
 void step_reset_counters(void) {
   counter_l = 0.0;
   counter_r = 0.0;

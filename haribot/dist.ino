@@ -6,7 +6,7 @@ void dist_setup() {
   pinMode(echoPin, INPUT);
 }
 
-long dist_read() {
+static long dist_read() {
   long duration, distance;
 
   digitalWrite(trigPin, LOW);
@@ -22,37 +22,85 @@ long dist_read() {
   return distance;
 }
 
+long dist_last_read = 0;
+
+void update_distance() {
+  dist_last_read = dist_read();
+}
+
+/***/
+
 int distance_to_keep = 0;
 
-void distance_new_program() {
-  if (prefix("stopped", program)) {
+void distance_new_instruction() {
+  if (prefix("stopped", program.c_str())) {
     delay(1000);
-  } else if (prefix("stop", program)) {
+  } else if (prefix("stop", program.c_str())) {
     log_info("Stopping.\n");
     program = "stoppped";
-  } else if (prefix("dist", program)) {
+    step_stop();
 
-  } else if (prefix("help", program)) {
+  } else if (prefix("dist", program.c_str())) {
+    distance_to_keep = atoi(&program.c_str()[strlen("dist")]);
+    sprintf(buffer, "Distance to keep: %dcm.\n", distance_to_keep);
+    log_info(buffer);
+
+    if (distance_to_keep < 5) {
+      log_info("Dist is too short.\n");
+      distance_to_keep = 0;
+    }
+
+    if (distance_to_keep > 50) {
+      log_info("Dist is too long.\n");
+      distance_to_keep = 0;
+    }
+
+  } else if (prefix("help", program.c_str())) {
     log_info("Keep distance mode. Available commands:\n");
-    log_info("- stop -> stop and wait\n");
-    log_info("- dist<cm> -> keep a distance of N cm\n");
+    log_info("# dist<cm> --> keep a distance of N cm\n");
+    log_info("# stop     --> stop and wait\n");
+    log_info("# help     --> show some help\n");
   } else {
-    log_info("Unknown command: ");
-    log_info(program);
+    log_info("dist: Unknown command: ");
+    log_info(program.c_str());
     log_info("\nStopping\n");
-    program = "stoppped";
+    distance_to_keep = 0;
   }
 }
 
 void distance_process_step() {
-  if (distance_to_keep <= 5) {
-    sprintf(buffer, "Distance of %dcm is to short to keep.\n", distance_to_keep);
-    log_info(buffer);
-    delay(1000);
+  if (distance_to_keep == 0) {
     return;
   }
+  static unsigned long seen_dist_read_time = 0;
 
-  sprintf(buffer, "Don't know how to keep a distance  of %dcm at the moment.\n", distance_to_keep);
+  if (seen_dist_read_time == last_dist_read_time) {
+    // distance already processed
+    return;
+  }
+  seen_dist_read_time = last_dist_read_time;
+
+  sprintf(buffer, "dist: %d cm\n", dist_last_read);
   log_info(buffer);
-  delay(1000);
+
+
+  static bool distance_too_big = false;
+
+  if (dist_last_read > 100) {
+    if (!distance_too_big) {
+      sprintf(buffer, "Distance of %dcm is to big!.\n", dist_last_read);
+      log_info(buffer);
+    }
+    distance_too_big = true;
+    return;
+  }
+  distance_too_big = false;
+
+  int distance_to_move = dist_last_read - distance_to_keep;
+
+
+  sprintf(buffer, "move: %dcm\n", distance_to_move);
+  log_info(buffer);
+
+  step_move(distance_to_move, distance_to_move);
 }
