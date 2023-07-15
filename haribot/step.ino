@@ -92,35 +92,35 @@ void step_reset(void) {
 void step_reset_counters(void) {
   counter_l = 0.0;
   counter_r = 0.0;
-  log_info("Counters reseted\n");
+  log_info(F("Counters reseted\n"));
 }
 
 void step_forward() {
   step_move(SQUARE_SIZE, SQUARE_SIZE);
-  log_info("Forward\n");
+  log_info(F("Forward\n"));
 }
 
 void step_backward() {
   step_move(-SQUARE_SIZE, -SQUARE_SIZE);
-  log_info("Backard\n");
+  log_info(F("Backard\n"));
 }
 
 void step_left() {
   step_move(-TWO_WHEELS_90_TURN, TWO_WHEELS_90_TURN);
-  log_info("Two wheels left\n");
+  log_info(F("Two wheels left\n"));
 }
 
 void step_right() {
   step_move(TWO_WHEELS_90_TURN, -TWO_WHEELS_90_TURN);
-  log_info("Two wheels right\n");
+  log_info(F("Two wheels right\n"));
 }
 
 void step_one_wheel_left() {
   step_move(0, ONE_WHEEL_90_TURN);
-  log_info("One wheel left\n");
+  log_info(F("One wheel left\n"));
 }
 
 void step_one_wheel_right() {
   step_move(ONE_WHEEL_90_TURN, 0);
-  log_info("One wheel right\n");
+  log_info(F("One wheel right\n"));
 }

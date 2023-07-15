@@ -11,6 +11,10 @@ void bt_info(char *msg) {
   hc06.write(msg);
 }
 
+void bt_info(const __FlashStringHelper *msg) {
+  hc06.write(msg);
+}
+
 String bt_read() {
   if (! hc06.available()) {
     return String();

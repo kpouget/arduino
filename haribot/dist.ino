@@ -36,34 +36,35 @@ void distance_new_instruction() {
   if (prefix("stopped", program.c_str())) {
     delay(1000);
   } else if (prefix("stop", program.c_str())) {
-    log_info("Stopping.\n");
+    log_info(F("Stopping.\n"));
     program = "stoppped";
     step_stop();
 
   } else if (prefix("dist", program.c_str())) {
     distance_to_keep = atoi(&program.c_str()[strlen("dist")]);
-    sprintf(buffer, "Distance to keep: %dcm.\n", distance_to_keep);
+    sprintf(buffer, "%dcm.\n", distance_to_keep);
+    log_info(F("Distance to keep: "));
     log_info(buffer);
 
     if (distance_to_keep < 5) {
-      log_info("Dist is too short.\n");
+      log_info(F("Dist is too short.\n"));
       distance_to_keep = 0;
     }
 
     if (distance_to_keep > 50) {
-      log_info("Dist is too long.\n");
+      log_info(F("Dist is too long.\n"));
       distance_to_keep = 0;
     }
 
   } else if (prefix("help", program.c_str())) {
-    log_info("Keep distance mode. Available commands:\n");
-    log_info("# dist<cm> --> keep a distance of N cm\n");
-    log_info("# stop     --> stop and wait\n");
-    log_info("# help     --> show some help\n");
+    log_info(F("Keep distance mode. Available commands:\n"));
+    log_info(F("# dist<cm> --> keep a distance of N cm\n"));
+  log_info(F("# stop     --> stop and wait\n"));
+  log_info(F("# help     --> show some help\n"));
   } else {
-    log_info("dist: Unknown command: ");
+    log_info(F("dist: Unknown command: "));
     log_info(program.c_str());
-    log_info("\nStopping\n");
+    log_info(F("\nStopping\n"));
     distance_to_keep = 0;
   }
 }

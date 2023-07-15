@@ -6,6 +6,10 @@ void serial_info(char *msg) {
   Serial.print(msg);
 }
 
+void serial_info(const __FlashStringHelper *msg) {
+  Serial.print(msg);
+}
+
 String serial_read() {
   if (! Serial.available()) {
     return String();

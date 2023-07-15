@@ -4,23 +4,30 @@ static int current_step = 0;
 static String program = "";
 
 void setup() {
-  //log_info("Initializing the bluetooth ...\n");
+  log_info(F("Initializing the bluetooth ...\n"));
   bt_setup();
-  //log_info("Initializing the serial link ...\n");
+  log_info(F("Initializing the serial link ...\n"));
   serial_setup();
-  //log_info("Initializing the motors ...\n");
+  log_info(F("Initializing the motors ...\n"));
   step_setup();
-  //log_info(("Initializing the sonar ...\n");
+  log_info(F("Initializing the sonar ...\n"));
   dist_setup();
 
-  //program = CONFIG_HELP_PREFIX;
-  //process_new_instruction();
-  //log_info("---\n");
+
+  program = CONFIG_HELP_PREFIX;
+  process_new_instruction();
+  log_info(F("---\n"));
   process_new_mode(CONFIG_MODE_DEFAULT);
   process_new_instruction();
-  log_info("Ready!\n");
-  log_info("---\n");
+  log_info(F("Ready!\n"));
+  log_info(F("---\n"));
 }
+
+void log_info(const __FlashStringHelper *msg) {
+  bt_info(msg);
+  serial_info(msg);
+}
+
 
 void log_info(char *msg) {
   bt_info(msg);
@@ -39,7 +46,8 @@ void check_instruction_update() {
     }
   }
 
-  sprintf(buffer, "New instruction: |%s|\n", msg.c_str());
+  log_info(F("New instruction: "));
+  sprintf(buffer, "|%s|\n", msg.c_str());
   log_info(buffer);
 
   current_step = 0;
@@ -70,7 +78,7 @@ void process_step() {
 
   if (current_step >= program.length()) {
     if (current_step == program.length()) {
-      log_info("Finished, waiting for new instructions ...\n");
+      log_info(F("Finished, waiting for new instructions ...\n"));
       current_step++ ;
     }
     delay(100);
@@ -82,7 +90,8 @@ void process_step() {
   char action = program.c_str()[current_step];
   int debug = 0;
   if (debug) {
-    sprintf(buffer, "Program: %s[%d] = %c\n",
+    log_info(F("Program: "));
+    sprintf(buffer, "%s[%d] = %c\n",
             program.c_str(), current_step, action);
     log_info(buffer);
   }
@@ -96,8 +105,10 @@ void process_step() {
     break;
 
   default:
-    sprintf(buffer, "Unknown mode: '%d'. Panicking\n", cfg_mode);
+    log_info(F("Unknown mode: "));
+    sprintf(buffer, "'%d'", cfg_mode);
     log_info(buffer);
+    log_info(F(". Panicking\n"));
     delay(1000);
   }
 
