@@ -4,7 +4,7 @@ void loop_calibrate(char action) {
   float cpt = atof(&program[current_step + 1]);
   switch (action) {
   case 'l':
-    sprintf(buffer, "left: %d cm\n", cpt);
+    sprintf(buffer, "left: %.1f cm\n", cpt);
     log_info(buffer);
     step_move(cpt, 0);
     break;
@@ -87,6 +87,10 @@ void loop_program(char action) {
     log_info("L: 90* left with one wheels\n");
     log_info("r: 90* right with one wheel\n");
     log_info("R: 90* right with two wheels\n");
+    log_info("\n");
+    log_info("f: 1 square forwards\n");
+    log_info("b: 1 square backwards\n");
+    log_info("\n");
     log_info("z: reset the distance counters\n");
     log_info("x: sleep for 1s\n");
     break;

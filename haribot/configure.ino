@@ -33,7 +33,7 @@ void process_new_mode(int new_mode) {
     break;
 
   default:
-    sprintf(buffer, "Unknown mode requested: '%d'. Ignoring (%s)\n", new_mode, &program.c_str()[strlen(CONFIG_MODE_PREFIX)]);
+    sprintf(buffer, "Unknown mode requested: '%d'. Current mode: %d.\n", new_mode, cfg_mode);
     log_info(buffer);
     new_mode = cfg_mode;
   }

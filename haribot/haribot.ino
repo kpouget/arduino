@@ -92,11 +92,11 @@ void process_step() {
     loop_calibrate(action);
     break;
   case CONFIG_MODE_PROGRAM:
-    loop_calibrate(action);
+    loop_program(action);
     break;
 
   default:
-    sprintf(buffer, "Unknown mode: '%d'. Panicing\n", cfg_mode);
+    sprintf(buffer, "Unknown mode: '%d'. Panicking\n", cfg_mode);
     log_info(buffer);
     delay(1000);
   }
